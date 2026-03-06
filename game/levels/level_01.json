@@ -1,0 +1,25 @@
+{
+  "id": "level_01",
+  "name": "Level 1 - Introduction",
+  "width": 8,
+  "height": 8,
+  "sim_step_seconds": 0.35,
+  "overload_max": 18,
+  "objectives": {
+    "blue": 8
+  },
+  "components": [
+    {"x": 0, "y": 3, "type": "source", "orientation": 1, "signal_type": "blue", "spawn_interval_steps": 4},
+    {"x": 1, "y": 3, "type": "straight_wire", "orientation": 1},
+    {"x": 2, "y": 3, "type": "corner_wire", "orientation": 2},
+    {"x": 2, "y": 4, "type": "straight_wire", "orientation": 0},
+    {"x": 2, "y": 5, "type": "corner_wire", "orientation": 0},
+    {"x": 3, "y": 5, "type": "straight_wire", "orientation": 1},
+    {"x": 4, "y": 5, "type": "straight_wire", "orientation": 1},
+    {"x": 5, "y": 5, "type": "sink", "orientation": 1, "signal_type": "blue"},
+
+    {"x": 3, "y": 3, "type": "wall"},
+    {"x": 4, "y": 3, "type": "wall"},
+    {"x": 4, "y": 4, "type": "wall"}
+  ]
+}

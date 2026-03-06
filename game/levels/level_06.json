@@ -1,0 +1,67 @@
+{
+  "id": "level_06",
+  "name": "Level 6 - Mixed System Challenge",
+  "width": 12,
+  "height": 10,
+  "sim_step_seconds": 0.24,
+  "overload_max": 30,
+  "objectives": {
+    "blue": 22,
+    "red": 12
+  },
+  "components": [
+    {"x": 0, "y": 2, "type": "source", "orientation": 1, "signal_type": "blue", "spawn_interval_steps": 2},
+    {"x": 1, "y": 2, "type": "straight_wire", "orientation": 1},
+    {"x": 2, "y": 2, "type": "straight_wire", "orientation": 1},
+    {"x": 3, "y": 2, "type": "splitter", "orientation": 3, "state": 0},
+
+    {"x": 3, "y": 1, "type": "corner_wire", "orientation": 1},
+    {"x": 4, "y": 1, "type": "straight_wire", "orientation": 1},
+    {"x": 5, "y": 1, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 1, "type": "straight_wire", "orientation": 1},
+    {"x": 7, "y": 1, "type": "straight_wire", "orientation": 1},
+    {"x": 8, "y": 1, "type": "sink", "orientation": 1, "signal_type": "blue"},
+
+    {"x": 3, "y": 3, "type": "corner_wire", "orientation": 0},
+    {"x": 4, "y": 3, "type": "straight_wire", "orientation": 1},
+    {"x": 5, "y": 3, "type": "straight_wire", "orientation": 0},
+    {"x": 6, "y": 3, "type": "straight_wire", "orientation": 1},
+    {"x": 7, "y": 3, "type": "straight_wire", "orientation": 1},
+    {"x": 8, "y": 3, "type": "sink", "orientation": 1, "signal_type": "blue"},
+
+    {"x": 11, "y": 5, "type": "source", "orientation": 3, "signal_type": "blue", "spawn_interval_steps": 4},
+    {"x": 10, "y": 5, "type": "straight_wire", "orientation": 1},
+    {"x": 9, "y": 5, "type": "gate", "orientation": 1, "state": 1},
+
+    {"x": 9, "y": 4, "type": "corner_wire", "orientation": 3},
+    {"x": 8, "y": 4, "type": "straight_wire", "orientation": 1},
+    {"x": 7, "y": 4, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 4, "type": "sink", "orientation": 3, "signal_type": "blue"},
+
+    {"x": 9, "y": 6, "type": "corner_wire", "orientation": 3},
+    {"x": 8, "y": 6, "type": "straight_wire", "orientation": 1},
+    {"x": 7, "y": 6, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 6, "type": "sink", "orientation": 3, "signal_type": "red"},
+
+    {"x": 0, "y": 8, "type": "source", "orientation": 1, "signal_type": "red", "spawn_interval_steps": 3},
+    {"x": 1, "y": 8, "type": "straight_wire", "orientation": 1},
+    {"x": 2, "y": 8, "type": "straight_wire", "orientation": 1},
+    {"x": 3, "y": 8, "type": "straight_wire", "orientation": 1},
+    {"x": 4, "y": 8, "type": "gate", "orientation": 3, "state": 1},
+
+    {"x": 4, "y": 9, "type": "corner_wire", "orientation": 0},
+    {"x": 5, "y": 9, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 9, "type": "straight_wire", "orientation": 0},
+    {"x": 7, "y": 9, "type": "sink", "orientation": 1, "signal_type": "red"},
+
+    {"x": 4, "y": 7, "type": "corner_wire", "orientation": 1},
+    {"x": 5, "y": 7, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 7, "type": "straight_wire", "orientation": 1},
+    {"x": 7, "y": 7, "type": "sink", "orientation": 1, "signal_type": "blue"},
+
+    {"x": 9, "y": 2, "type": "wall"},
+    {"x": 9, "y": 8, "type": "wall"},
+    {"x": 5, "y": 5, "type": "wall"},
+    {"x": 2, "y": 5, "type": "wall"}
+  ]
+}

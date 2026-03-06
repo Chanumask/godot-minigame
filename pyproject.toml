@@ -1,0 +1,22 @@
+[project]
+name = "signal-routing-panic-tooling"
+version = "0.1.0"
+description = "Local Python tooling for the Signal Routing Panic repository"
+requires-python = ">=3.11"
+
+[dependency-groups]
+dev = [
+  "ruff>=0.11.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [".venv", ".uv-cache"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

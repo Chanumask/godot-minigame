@@ -1,0 +1,55 @@
+{
+  "id": "level_05",
+  "name": "Level 5 - Splitter Logic",
+  "width": 11,
+  "height": 10,
+  "sim_step_seconds": 0.27,
+  "overload_max": 28,
+  "objectives": {
+    "blue": 14,
+    "red": 10
+  },
+  "components": [
+    {"x": 0, "y": 3, "type": "source", "orientation": 1, "signal_type": "blue", "spawn_interval_steps": 2},
+    {"x": 1, "y": 3, "type": "straight_wire", "orientation": 1},
+    {"x": 2, "y": 3, "type": "straight_wire", "orientation": 1},
+    {"x": 3, "y": 3, "type": "splitter", "orientation": 3, "state": 0},
+
+    {"x": 3, "y": 2, "type": "corner_wire", "orientation": 1},
+    {"x": 4, "y": 2, "type": "straight_wire", "orientation": 1},
+    {"x": 5, "y": 2, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 2, "type": "straight_wire", "orientation": 1},
+    {"x": 7, "y": 2, "type": "straight_wire", "orientation": 1},
+    {"x": 8, "y": 2, "type": "sink", "orientation": 1, "signal_type": "blue"},
+
+    {"x": 3, "y": 4, "type": "corner_wire", "orientation": 0},
+    {"x": 4, "y": 4, "type": "straight_wire", "orientation": 1},
+    {"x": 5, "y": 4, "type": "straight_wire", "orientation": 0},
+    {"x": 6, "y": 4, "type": "straight_wire", "orientation": 1},
+    {"x": 7, "y": 4, "type": "straight_wire", "orientation": 1},
+    {"x": 8, "y": 4, "type": "sink", "orientation": 1, "signal_type": "blue"},
+
+    {"x": 0, "y": 7, "type": "source", "orientation": 1, "signal_type": "red", "spawn_interval_steps": 3},
+    {"x": 1, "y": 7, "type": "straight_wire", "orientation": 1},
+    {"x": 2, "y": 7, "type": "straight_wire", "orientation": 1},
+    {"x": 3, "y": 7, "type": "splitter", "orientation": 3, "state": 1},
+
+    {"x": 3, "y": 6, "type": "corner_wire", "orientation": 1},
+    {"x": 4, "y": 6, "type": "straight_wire", "orientation": 1},
+    {"x": 5, "y": 6, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 6, "type": "straight_wire", "orientation": 1},
+    {"x": 7, "y": 6, "type": "straight_wire", "orientation": 1},
+    {"x": 8, "y": 6, "type": "sink", "orientation": 1, "signal_type": "red"},
+
+    {"x": 3, "y": 8, "type": "corner_wire", "orientation": 0},
+    {"x": 4, "y": 8, "type": "straight_wire", "orientation": 1},
+    {"x": 5, "y": 8, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 8, "type": "straight_wire", "orientation": 0},
+    {"x": 7, "y": 8, "type": "straight_wire", "orientation": 1},
+    {"x": 8, "y": 8, "type": "sink", "orientation": 1, "signal_type": "red"},
+
+    {"x": 9, "y": 5, "type": "wall"},
+    {"x": 9, "y": 3, "type": "wall"},
+    {"x": 9, "y": 7, "type": "wall"}
+  ]
+}

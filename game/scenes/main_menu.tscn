@@ -1,0 +1,184 @@
+[gd_scene load_steps=7 format=3 uid="uid://mainmenuscene"]
+
+[ext_resource type="Script" path="res://game/scenes/main_menu.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://game/ui/menu_panel.tscn" id="2_menu"]
+[ext_resource type="Script" path="res://game/ui/menu_background.gd" id="3_bg"]
+[ext_resource type="Script" path="res://game/audio/audio_hooks.gd" id="4_audio"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header"]
+bg_color = Color(0.03, 0.05, 0.09, 0.72)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.45, 0.56, 0.74, 0.56)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.24)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_howto"]
+bg_color = Color(0.03, 0.05, 0.09, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.46, 0.56, 0.72, 0.78)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 14
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_bg")
+
+[node name="BackgroundDim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.32)
+
+[node name="HeaderPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.14
+anchor_right = 0.5
+anchor_bottom = 0.14
+offset_left = -420.0
+offset_top = -58.0
+offset_right = 420.0
+offset_bottom = 58.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_header")
+
+[node name="Title" type="Label" parent="HeaderPanel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -390.0
+offset_top = 10.0
+offset_right = 390.0
+offset_bottom = 58.0
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 52
+theme_override_colors/font_color = Color(0.97, 0.98, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.05, 0.08, 0.95)
+theme_override_constants/outline_size = 3
+text = "Signal Routing Panic"
+
+[node name="Subtitle" type="Label" parent="HeaderPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -390.0
+offset_top = 64.0
+offset_right = 390.0
+offset_bottom = 96.0
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.91, 0.94, 1, 0.96)
+theme_override_colors/font_outline_color = Color(0.03, 0.05, 0.08, 0.88)
+theme_override_constants/outline_size = 2
+text = "Route live signals. Prevent overload."
+
+[node name="MenuPanel" parent="." instance=ExtResource("2_menu")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -170.0
+offset_right = 250.0
+offset_bottom = 170.0
+
+[node name="HowToPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -240.0
+offset_right = 500.0
+offset_bottom = 240.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_howto")
+
+[node name="Margin" type="MarginContainer" parent="HowToPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 18
+
+[node name="VBox" type="VBoxContainer" parent="HowToPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="HowToTitle" type="Label" parent="HowToPanel/Margin/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 34
+theme_override_colors/font_color = Color(0.97, 0.98, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.05, 0.08, 0.9)
+theme_override_constants/outline_size = 2
+text = "How To Play"
+
+[node name="HowToText" type="Label" parent="HowToPanel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.93, 0.95, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.05, 0.08, 0.82)
+theme_override_constants/outline_size = 1
+text = "Objective\nRoute signal packets to matching sinks and complete delivery targets before overload reaches maximum.\n\nCore Mechanics\nSources emit live blue and red packets. Rotate wires and splitters with Space. Toggle gates to choose output paths. Incorrect routing increases overload.\n\nControls\nArrow Keys or WASD: Move cursor\nSpace: Rotate or toggle selected component\nR: Restart level\nEsc: Pause during gameplay / back in menus"
+
+[node name="HowToFooter" type="Label" parent="HowToPanel/Margin/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.05, 0.08, 0.82)
+theme_override_constants/outline_size = 1
+text = "Press Esc to return."
+
+[node name="AudioHooks" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("4_audio")

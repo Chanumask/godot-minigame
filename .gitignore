@@ -1,0 +1,6 @@
+.import/
+.godot/
+*.translation
+.venv/
+.uv-cache/
+.ruff_cache/

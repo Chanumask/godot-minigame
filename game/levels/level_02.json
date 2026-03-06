@@ -1,0 +1,37 @@
+{
+  "id": "level_02",
+  "name": "Level 2 - Mixed Routing",
+  "width": 10,
+  "height": 8,
+  "sim_step_seconds": 0.32,
+  "overload_max": 22,
+  "objectives": {
+    "blue": 9,
+    "red": 7
+  },
+  "components": [
+    {"x": 0, "y": 1, "type": "source", "orientation": 1, "signal_type": "blue", "spawn_interval_steps": 3},
+    {"x": 1, "y": 1, "type": "straight_wire", "orientation": 1},
+    {"x": 2, "y": 1, "type": "corner_wire", "orientation": 2},
+    {"x": 2, "y": 2, "type": "straight_wire", "orientation": 0},
+    {"x": 2, "y": 3, "type": "corner_wire", "orientation": 0},
+    {"x": 3, "y": 3, "type": "straight_wire", "orientation": 1},
+    {"x": 4, "y": 3, "type": "gate", "orientation": 3, "state": 1},
+    {"x": 4, "y": 4, "type": "corner_wire", "orientation": 0},
+    {"x": 5, "y": 4, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 4, "type": "sink", "orientation": 1, "signal_type": "blue"},
+
+    {"x": 9, "y": 5, "type": "source", "orientation": 3, "signal_type": "red", "spawn_interval_steps": 4},
+    {"x": 8, "y": 5, "type": "straight_wire", "orientation": 1},
+    {"x": 7, "y": 5, "type": "corner_wire", "orientation": 0},
+    {"x": 7, "y": 6, "type": "corner_wire", "orientation": 3},
+    {"x": 6, "y": 6, "type": "straight_wire", "orientation": 1},
+    {"x": 5, "y": 6, "type": "straight_wire", "orientation": 1},
+    {"x": 4, "y": 6, "type": "straight_wire", "orientation": 1},
+    {"x": 3, "y": 6, "type": "sink", "orientation": 3, "signal_type": "red"},
+
+    {"x": 4, "y": 2, "type": "wall"},
+    {"x": 5, "y": 2, "type": "wall"},
+    {"x": 5, "y": 3, "type": "wall"}
+  ]
+}

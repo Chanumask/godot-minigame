@@ -1,0 +1,49 @@
+{
+  "id": "level_04",
+  "name": "Level 4 - Gate Routing",
+  "width": 11,
+  "height": 9,
+  "sim_step_seconds": 0.30,
+  "overload_max": 24,
+  "objectives": {
+    "blue": 10,
+    "red": 10
+  },
+  "components": [
+    {"x": 0, "y": 2, "type": "source", "orientation": 1, "signal_type": "blue", "spawn_interval_steps": 3},
+    {"x": 1, "y": 2, "type": "straight_wire", "orientation": 1},
+    {"x": 2, "y": 2, "type": "straight_wire", "orientation": 1},
+    {"x": 3, "y": 2, "type": "straight_wire", "orientation": 1},
+    {"x": 4, "y": 2, "type": "gate", "orientation": 3, "state": 0},
+
+    {"x": 4, "y": 1, "type": "corner_wire", "orientation": 1},
+    {"x": 5, "y": 1, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 1, "type": "straight_wire", "orientation": 1},
+    {"x": 7, "y": 1, "type": "sink", "orientation": 1, "signal_type": "blue"},
+
+    {"x": 4, "y": 3, "type": "corner_wire", "orientation": 0},
+    {"x": 5, "y": 3, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 3, "type": "straight_wire", "orientation": 1},
+    {"x": 7, "y": 3, "type": "sink", "orientation": 1, "signal_type": "red"},
+
+    {"x": 0, "y": 6, "type": "source", "orientation": 1, "signal_type": "red", "spawn_interval_steps": 4},
+    {"x": 1, "y": 6, "type": "straight_wire", "orientation": 1},
+    {"x": 2, "y": 6, "type": "straight_wire", "orientation": 1},
+    {"x": 3, "y": 6, "type": "straight_wire", "orientation": 1},
+    {"x": 4, "y": 6, "type": "gate", "orientation": 3, "state": 1},
+
+    {"x": 4, "y": 7, "type": "corner_wire", "orientation": 0},
+    {"x": 5, "y": 7, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 7, "type": "straight_wire", "orientation": 1},
+    {"x": 7, "y": 7, "type": "sink", "orientation": 1, "signal_type": "red"},
+
+    {"x": 4, "y": 5, "type": "corner_wire", "orientation": 1},
+    {"x": 5, "y": 5, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 5, "type": "straight_wire", "orientation": 1},
+    {"x": 7, "y": 5, "type": "sink", "orientation": 1, "signal_type": "blue"},
+
+    {"x": 8, "y": 4, "type": "wall"},
+    {"x": 8, "y": 2, "type": "wall"},
+    {"x": 8, "y": 6, "type": "wall"}
+  ]
+}

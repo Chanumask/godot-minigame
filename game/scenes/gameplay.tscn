@@ -1,0 +1,173 @@
+[gd_scene load_steps=7 format=3 uid="uid://gameplayscene"]
+
+[ext_resource type="Script" path="res://game/scenes/gameplay.gd" id="1_script"]
+[ext_resource type="Script" path="res://game/ui/board_view.gd" id="2_board"]
+[ext_resource type="PackedScene" path="res://game/ui/hud.tscn" id="3_hud"]
+[ext_resource type="Script" path="res://game/audio/audio_hooks.gd" id="4_audio"]
+[ext_resource type="PackedScene" path="res://game/ui/menu_panel.tscn" id="5_menu"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_end_state"]
+bg_color = Color(0.05, 0.07, 0.11, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.51, 0.62, 0.79, 0.82)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.34)
+shadow_size = 14
+
+[node name="Gameplay" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.07, 0.09, 1)
+
+[node name="BoardView" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+offset_right = 0.0
+offset_bottom = 0.0
+script = ExtResource("2_board")
+
+[node name="HUD" parent="." instance=ExtResource("3_hud")]
+unique_name_in_owner = true
+
+[node name="FlashOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0.2, 0.2, 0)
+mouse_filter = 2
+
+[node name="CountdownLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -96.0
+offset_right = 160.0
+offset_bottom = 96.0
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 118
+text = "3"
+visible = false
+mouse_filter = 2
+modulate = Color(1, 1, 1, 0.9)
+
+[node name="DimOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.45)
+visible = false
+mouse_filter = 2
+
+[node name="MenuPanel" parent="." instance=ExtResource("5_menu")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -230.0
+offset_top = -160.0
+offset_right = 230.0
+offset_bottom = 160.0
+visible = false
+
+[node name="EndStatePanel" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -330.0
+offset_top = -170.0
+offset_right = 330.0
+offset_bottom = 170.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_end_state")
+
+[node name="Margin" type="MarginContainer" parent="EndStatePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="EndStatePanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="EndTitle" type="Label" parent="EndStatePanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 46
+theme_override_colors/font_color = Color(0.97, 0.98, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.04, 0.06, 0.95)
+theme_override_constants/outline_size = 3
+text = "LEVEL COMPLETE"
+
+[node name="EndMessage" type="Label" parent="EndStatePanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.92, 0.95, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.04, 0.06, 0.82)
+theme_override_constants/outline_size = 1
+text = "All objectives achieved."
+
+[node name="EndActions" type="Label" parent="EndStatePanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.98, 0.89, 0.64, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.04, 0.06, 0.82)
+theme_override_constants/outline_size = 1
+text = "Enter -> Next Level\\nR -> Retry Level\\nEsc -> Level Select"
+
+[node name="AudioHooks" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("4_audio")
