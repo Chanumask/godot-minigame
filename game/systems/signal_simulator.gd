@@ -1,6 +1,8 @@
 extends RefCounted
 class_name SignalSimulator
 
+const CORRUPTED_NORMAL_SINK_OVERLOAD_SPIKE := 8
+
 var width: int = 0
 var height: int = 0
 var tiles: Array = []
@@ -25,6 +27,8 @@ func setup(level_data: Dictionary) -> void:
 					"y": y,
 					"interval": int(tile.get("spawn_interval_steps", 3)),
 					"timer": 0,
+					"emission_count": 0,
+					"corruption_interval": int(tile.get("corruption_interval_steps", 0)),
 					"signal_type": tile.get("signal_type", "blue"),
 					"direction": int(tile.get("orientation", 1))
 				})
@@ -41,6 +45,7 @@ func move_cursor_interact(cursor: Vector2i) -> bool:
 func step() -> Dictionary:
 	var delivered_now: Dictionary = {"blue": 0, "red": 0}
 	var failures_now := 0
+	var overload_spike := 0
 	var feedback_events: Array = []
 
 	for i in range(sources.size()):
@@ -48,12 +53,26 @@ func step() -> Dictionary:
 		source["timer"] = int(source.get("timer", 0)) + 1
 		if int(source.get("timer", 0)) >= int(source.get("interval", 1)):
 			source["timer"] = 0
+			source["emission_count"] = int(source.get("emission_count", 0)) + 1
+			var corruption_interval: int = int(source.get("corruption_interval", 0))
+			var is_corrupted := (
+				corruption_interval > 0
+				and int(source.get("emission_count", 0)) % corruption_interval == 0
+			)
 			signals.append({
 				"x": source["x"],
 				"y": source["y"],
 				"dir": source["direction"],
 				"signal_type": source["signal_type"],
+				"is_corrupted": is_corrupted,
+				"age_steps": 0,
 			})
+			if is_corrupted:
+				feedback_events.append({
+					"type": "corrupted_spawn",
+					"x": source["x"],
+					"y": source["y"],
+				})
 		sources[i] = source
 
 	var next_signals: Array = []
@@ -72,17 +91,39 @@ func step() -> Dictionary:
 		var tile: Dictionary = tiles[target.y][target.x]
 		var tile_type: String = tile.get("type", "empty")
 		var signal_type: String = packet.get("signal_type", "blue")
+		var is_corrupted: bool = bool(packet.get("is_corrupted", false))
 
-		if tile_type == "sink":
-			var sink_side := Directions.opposite(int(tile.get("orientation", 0)))
-			var sink_type: String = tile.get("signal_type", "blue")
-			if incoming == sink_side and sink_type == signal_type:
-				delivered[signal_type] = int(delivered.get(signal_type, 0)) + 1
-				delivered_now[signal_type] = int(delivered_now.get(signal_type, 0)) + 1
-				feedback_events.append({"type": "delivered", "signal_type": signal_type})
+		if tile_type == "purge_sink":
+			var purge_side := Directions.opposite(int(tile.get("orientation", 0)))
+			if incoming == purge_side and is_corrupted:
+				feedback_events.append({
+					"type": "corrupted_purged",
+					"x": target.x,
+					"y": target.y,
+				})
 			else:
 				failures_now += 1
-				feedback_events.append({"type": "failure", "reason": "incompatible_sink"})
+				feedback_events.append({"type": "failure", "reason": "invalid_purge"})
+			continue
+
+		if tile_type == "sink":
+			if is_corrupted:
+				failures_now += 1
+				overload_spike += CORRUPTED_NORMAL_SINK_OVERLOAD_SPIKE
+				feedback_events.append({
+					"type": "corrupted_sink_penalty",
+					"amount": CORRUPTED_NORMAL_SINK_OVERLOAD_SPIKE,
+				})
+			else:
+				var sink_side := Directions.opposite(int(tile.get("orientation", 0)))
+				var sink_type: String = tile.get("signal_type", "blue")
+				if incoming == sink_side and sink_type == signal_type:
+					delivered[signal_type] = int(delivered.get(signal_type, 0)) + 1
+					delivered_now[signal_type] = int(delivered_now.get(signal_type, 0)) + 1
+					feedback_events.append({"type": "delivered", "signal_type": signal_type})
+				else:
+					failures_now += 1
+					feedback_events.append({"type": "failure", "reason": "incompatible_sink"})
 			continue
 
 		if tile_type in ["empty", "wall", "source"]:
@@ -105,6 +146,8 @@ func step() -> Dictionary:
 			"y": target.y,
 			"dir": int(routed.get("outgoing", direction)),
 			"signal_type": signal_type,
+			"is_corrupted": is_corrupted,
+			"age_steps": int(packet.get("age_steps", 0)) + 1,
 		})
 
 	signals = next_signals
@@ -112,6 +155,7 @@ func step() -> Dictionary:
 	return {
 		"delivered": delivered_now,
 		"failures": failures_now,
+		"overload_spike": overload_spike,
 		"events": feedback_events,
 	}
 

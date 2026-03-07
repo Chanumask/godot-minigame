@@ -65,6 +65,14 @@ If you add Python helper scripts later, run them through the local environment:
 - `Space`: Interact with selected tile (rotate/toggle)
 - `R`: Restart current level
 - `Esc`: Pause/resume
+- `Y`: Slow down simulation speed
+- `X`: Speed up simulation speed
+
+### Speed Control
+- Speed modes are fixed and clamped: `Slow (0.85x)`, `Normal (1.0x)`, `Fast (1.2x)`.
+- `Y` steps down one mode (`Fast -> Normal -> Slow`).
+- `X` steps up one mode (`Slow -> Normal -> Fast`).
+- The current mode is shown on the HUD as `Speed: ...`.
 
 ## Game Summary
 - Each level starts with a 3-second countdown while the board is already visible.
@@ -107,6 +115,10 @@ Each level defines:
 - overload maximum
 - objective quotas per signal type
 - component placements with orientation/state/source/sink properties
+
+Source components support:
+- `spawn_interval_steps` (required for live spawning cadence)
+- `corruption_interval_steps` (optional): every Nth emitted packet from that source is corrupted. Missing or `0` means no corruption from that source.
 
 Core logic is not hardcoded per level; level files only provide board configuration.
 

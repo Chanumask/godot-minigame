@@ -9,18 +9,37 @@ enum MenuMode {
 const VOLUME_STEP_PERCENT := 5
 const VOLUME_BAR_SEGMENTS := 10
 
+const HOW_TO_PAGES: Array[Dictionary] = [
+	{
+		"title": "Objective",
+		"body": "- Route signals through the network.\n- Red signals go to red sinks.\n- Blue signals go to blue sinks.\n- Avoid increasing the overload meter.",
+	},
+	{
+		"title": "Controls and Components",
+		"body": "Move cursor: Arrow keys / WASD\nInteract: Space\nRestart: R\nPause: Esc\nSpeed: Y slow down, X speed up\n\nWires route signals.\nGates redirect signals.\nSplitters alternate outputs.",
+	},
+	{
+		"title": "Corrupted Signals",
+		"body": "Some sources occasionally emit corrupted packets.\nCorrupted packets must be routed to PURGE SINKS.\nIf corrupted packets enter a normal sink, a large overload spike occurs.",
+	},
+]
+
 const MENU_DEFAULT_OFFSETS := {
-	"left": -250.0,
-	"top": -170.0,
-	"right": 250.0,
-	"bottom": 170.0,
+	"left": -320.0,
+	"top": -150.0,
+	"right": 320.0,
+	"bottom": 290.0,
 }
 
 @onready var menu_panel: MenuPanel = %MenuPanel
 @onready var how_to_panel: Control = %HowToPanel
+@onready var how_to_title_label: Label = %HowToTitle
+@onready var how_to_page_label: Label = %HowToPage
+@onready var how_to_text_label: Label = %HowToText
 @onready var audio_hooks: AudioHooks = %AudioHooks
 
 var menu_mode: MenuMode = MenuMode.MAIN
+var how_to_page_index: int = 0
 
 func _ready() -> void:
 	menu_panel.item_selected.connect(_on_menu_item_selected)
@@ -49,7 +68,13 @@ func _input(event: InputEvent) -> void:
 		confirm_pressed = confirm_pressed or key_event.keycode in [KEY_ENTER, KEY_KP_ENTER]
 
 	if menu_mode == MenuMode.HOW_TO_PLAY:
-		if event.is_action_pressed("menu_back") or confirm_pressed:
+		if left_pressed:
+			_change_how_to_page(-1)
+			accept_event()
+		elif right_pressed:
+			_change_how_to_page(1)
+			accept_event()
+		elif event.is_action_pressed("menu_back"):
 			audio_hooks.play_event("menu_back")
 			_show_main_menu()
 			accept_event()
@@ -118,7 +143,7 @@ func _show_main_menu() -> void:
 	menu_panel.visible = true
 	how_to_panel.visible = false
 	_set_menu_offsets(MENU_DEFAULT_OFFSETS)
-	menu_panel.set_menu("Signal Routing Panic", [
+	menu_panel.set_menu("", [
 		{"id": "start", "label": "Start Game"},
 		{"id": "level_select", "label": "Level Select"},
 		{"id": "settings", "label": "Settings"},
@@ -180,6 +205,8 @@ func _show_how_to_play() -> void:
 	menu_mode = MenuMode.HOW_TO_PLAY
 	menu_panel.visible = false
 	how_to_panel.visible = true
+	how_to_page_index = 0
+	_update_how_to_page()
 
 func _set_menu_offsets(offsets: Dictionary) -> void:
 	menu_panel.offset_left = float(offsets.get("left", -250.0))
@@ -211,3 +238,23 @@ func _format_slider(percent: int) -> String:
 	for i in range(VOLUME_BAR_SEGMENTS):
 		bar += "#" if i < filled_segments else "-"
 	return "[%s] %d%%" % [bar, clamped_percent]
+
+func _change_how_to_page(delta: int) -> void:
+	if HOW_TO_PAGES.is_empty():
+		return
+	var next_index := clampi(how_to_page_index + delta, 0, HOW_TO_PAGES.size() - 1)
+	if next_index == how_to_page_index:
+		return
+	how_to_page_index = next_index
+	audio_hooks.play_event("menu_move")
+	_update_how_to_page()
+
+func _update_how_to_page() -> void:
+	if HOW_TO_PAGES.is_empty():
+		return
+
+	how_to_page_index = clampi(how_to_page_index, 0, HOW_TO_PAGES.size() - 1)
+	var page: Dictionary = HOW_TO_PAGES[how_to_page_index]
+	how_to_title_label.text = str(page.get("title", "How To Play"))
+	how_to_page_label.text = "Page %d / %d" % [how_to_page_index + 1, HOW_TO_PAGES.size()]
+	how_to_text_label.text = str(page.get("body", ""))

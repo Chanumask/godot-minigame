@@ -21,6 +21,7 @@ static var level_paths: Array[String] = [
 	"res://game/levels/level_04.json",
 	"res://game/levels/level_05.json",
 	"res://game/levels/level_06.json",
+	"res://game/levels/level_07.json",
 ]
 
 static var current_level_index: int = 0

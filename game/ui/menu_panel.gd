@@ -6,15 +6,21 @@ signal item_selected(item_id: String)
 const SELECTED_TEXT_COLOR := Color(1.0, 0.95, 0.72)
 const NORMAL_TEXT_COLOR := Color(0.90, 0.93, 0.98)
 const OUTLINE_COLOR := Color(0.03, 0.04, 0.06, 0.95)
+const MENU_HINT_DEFAULT := "Up/Down Select   Enter Confirm   Esc Back"
+const MENU_HINT_SETTINGS := "Up/Down Select   Left/Right Adjust   Enter Confirm   Esc Back"
 
 @onready var title_label: Label = %TitleLabel
+@onready var items_scroll: ScrollContainer = %ItemsScroll
 @onready var items_box: VBoxContainer = %ItemsBox
+@onready var hint_label: Label = %HintLabel
 
 var items: Array = []
 var selected_index: int = 0
 
-func set_menu(title: String, entries: Array) -> void:
+func set_menu(title: String, entries: Array, hint_text: String = "") -> void:
 	title_label.text = title
+	title_label.visible = not title.strip_edges().is_empty()
+	hint_label.text = _resolve_hint_text(title, hint_text)
 	items = entries.duplicate(true)
 	selected_index = 0
 	_redraw_items()
@@ -54,7 +60,7 @@ func _redraw_items() -> void:
 		var selected := i == selected_index
 		var row := PanelContainer.new()
 		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.custom_minimum_size = Vector2(0.0, 46.0)
+		row.custom_minimum_size = Vector2(0.0, 42.0)
 		row.add_theme_stylebox_override("panel", _make_row_style(selected))
 
 		var label := Label.new()
@@ -71,6 +77,8 @@ func _redraw_items() -> void:
 
 		row.add_child(label)
 		items_box.add_child(row)
+
+	call_deferred("_scroll_selected_into_view")
 
 func _make_row_style(selected: bool) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
@@ -99,3 +107,20 @@ func _make_row_style(selected: bool) -> StyleBoxFlat:
 		style.border_width_bottom = 1
 
 	return style
+
+func _resolve_hint_text(title: String, hint_text: String) -> String:
+	if not hint_text.is_empty():
+		return hint_text
+	if title == "Settings":
+		return MENU_HINT_SETTINGS
+	return MENU_HINT_DEFAULT
+
+func _scroll_selected_into_view() -> void:
+	if items_scroll == null:
+		return
+	if selected_index < 0 or selected_index >= items_box.get_child_count():
+		return
+	var row := items_box.get_child(selected_index) as Control
+	if row == null:
+		return
+	items_scroll.ensure_control_visible(row)

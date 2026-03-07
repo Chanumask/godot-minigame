@@ -7,6 +7,7 @@ const TILE_STRAIGHT := "straight_wire"
 const TILE_CORNER := "corner_wire"
 const TILE_SOURCE := "source"
 const TILE_SINK := "sink"
+const TILE_PURGE_SINK := "purge_sink"
 const TILE_GATE := "gate"
 const TILE_SPLITTER := "splitter"
 
@@ -47,6 +48,8 @@ static func get_ports(tile: Dictionary) -> Array[int]:
 		TILE_SOURCE:
 			return [orientation]
 		TILE_SINK:
+			return [Directions.opposite(orientation)]
+		TILE_PURGE_SINK:
 			return [Directions.opposite(orientation)]
 		TILE_GATE:
 			return _gate_ports(orientation, int(tile.get("state", 0)))

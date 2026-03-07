@@ -35,7 +35,17 @@ var countdown_last_tick_second: int = -1
 const COUNTDOWN_SECONDS := 3.0
 const END_TITLE_PULSE_SPEED := 2.2
 const END_TITLE_PULSE_AMOUNT := 0.06
+const OVERLOAD_WARNING_THRESHOLD_RATIO := 0.8
+const SPEED_MODE_NAMES: Array[String] = ["Slow", "Normal", "Fast"]
+const SPEED_MODE_MULTIPLIERS: Array[float] = [0.85, 1.0, 1.2]
+const CORRUPTED_SOURCE_HIGHLIGHT_DURATION := 0.34
+const CORRUPTED_PURGE_HIGHLIGHT_DURATION := 0.28
 var end_title_pulse_time: float = 0.0
+var corrupted_source_highlights: Array[Dictionary] = []
+var corrupted_purge_highlights: Array[Dictionary] = []
+var overload_warning_triggered: bool = false
+var speed_mode_index: int = 1
+var base_step_seconds: float = 0.35
 
 func _ready() -> void:
 	menu_panel.item_selected.connect(_on_menu_item_selected)
@@ -51,6 +61,8 @@ func _notification(what: int) -> void:
 func _process(delta: float) -> void:
 	_update_flash(delta)
 	_update_end_state_emphasis(delta)
+	_update_corrupted_spawn_feedback(delta)
+	_update_corrupted_purge_feedback(delta)
 
 	if game_state == GameState.COUNTDOWN:
 		countdown_remaining = max(countdown_remaining - delta, 0.0)
@@ -69,11 +81,16 @@ func _process(delta: float) -> void:
 		step_accumulator -= step_seconds
 		var result: Dictionary = simulator.step()
 		var failures: int = int(result.get("failures", 0))
+		var overload_spike: int = int(result.get("overload_spike", 0))
 		_play_step_audio_events(result)
-		if failures > 0:
-			overload_value = min(overload_value + failures, overload_max)
-			flash_timer = 0.22
-			audio_hooks.play_event("overload_warning")
+		if failures > 0 or overload_spike > 0:
+			var previous_overload := overload_value
+			overload_value = min(overload_value + failures + overload_spike, overload_max)
+			flash_timer = 0.34 if overload_spike > 0 else 0.22
+			audio_hooks.play_event("overload")
+			if _should_trigger_overload_warning(previous_overload, overload_value):
+				overload_warning_triggered = true
+				audio_hooks.play_event("overload_warning")
 
 		if overload_value >= overload_max:
 			_set_state(GameState.GAME_OVER)
@@ -94,6 +111,17 @@ func _input(event: InputEvent) -> void:
 		_load_current_level()
 		accept_event()
 		return
+
+	if game_state in [GameState.RUNNING, GameState.COUNTDOWN] and event is InputEventKey:
+		var key_event := event as InputEventKey
+		if key_event.keycode == KEY_Y:
+			_adjust_speed_mode(-1)
+			accept_event()
+			return
+		if key_event.keycode == KEY_X:
+			_adjust_speed_mode(1)
+			accept_event()
+			return
 
 	if event.is_action_pressed("pause"):
 		if game_state in [GameState.RUNNING, GameState.COUNTDOWN]:
@@ -209,13 +237,19 @@ func _load_current_level() -> void:
 	var path := GameSession.get_current_level_path()
 	level_data = LevelLoader.load_level(path)
 	simulator.setup(level_data)
-	step_seconds = float(level_data.get("sim_step_seconds", 0.35))
+	base_step_seconds = float(level_data.get("sim_step_seconds", 0.35))
+	_apply_speed_mode()
 	step_accumulator = 0.0
 	overload_max = int(level_data.get("overload_max", 20))
 	overload_value = 0
+	overload_warning_triggered = false
 	objectives = level_data.get("objectives", {}).duplicate(true)
 	cursor = Vector2i.ZERO
 	flash_timer = 0.0
+	corrupted_source_highlights.clear()
+	board_view.set_source_highlights([])
+	corrupted_purge_highlights.clear()
+	board_view.set_purge_highlights([])
 	countdown_remaining = COUNTDOWN_SECONDS
 	countdown_last_tick_second = -1
 	flash_overlay.color.a = 0.0
@@ -230,7 +264,6 @@ func _load_current_level() -> void:
 	_center_board_in_view()
 	_update_countdown_visual()
 	_refresh_hud()
-	audio_hooks.play_event("level_start")
 
 func _set_state(new_state: GameState) -> void:
 	game_state = new_state
@@ -275,12 +308,6 @@ func _on_menu_item_selected(item_id: String) -> void:
 		"restart":
 			GameSession.restart_level()
 			_load_current_level()
-		"next_level":
-			GameSession.advance_level()
-			_load_current_level()
-		"restart_game":
-			GameSession.start_new_game()
-			_load_current_level()
 		"main_menu":
 			_return_to_main_menu()
 
@@ -315,6 +342,7 @@ func _center_board_in_view() -> void:
 
 func _refresh_hud() -> void:
 	hud.set_level_name(level_data.get("name", "Level"))
+	hud.set_speed_mode(SPEED_MODE_NAMES[speed_mode_index])
 	hud.set_overload(overload_value, overload_max)
 	hud.set_objectives(objectives, simulator.delivered)
 
@@ -333,6 +361,26 @@ func _refresh_hud() -> void:
 	elif game_state == GameState.COUNTDOWN:
 		status = "Starting in %d..." % int(ceil(countdown_remaining))
 	hud.set_status(status)
+
+func _should_trigger_overload_warning(previous_value: int, new_value: int) -> bool:
+	if overload_warning_triggered or overload_max <= 0:
+		return false
+
+	var threshold_value: int = maxi(int(ceil(float(overload_max) * OVERLOAD_WARNING_THRESHOLD_RATIO)), 1)
+	return previous_value < threshold_value and new_value >= threshold_value
+
+func _adjust_speed_mode(delta: int) -> void:
+	var next_index := clampi(speed_mode_index + delta, 0, SPEED_MODE_NAMES.size() - 1)
+	if next_index == speed_mode_index:
+		return
+	speed_mode_index = next_index
+	_apply_speed_mode()
+	_refresh_hud()
+	audio_hooks.play_event("menu_move")
+
+func _apply_speed_mode() -> void:
+	var multiplier: float = SPEED_MODE_MULTIPLIERS[speed_mode_index]
+	step_seconds = max(base_step_seconds / multiplier, 0.01)
 
 func _update_flash(delta: float) -> void:
 	if flash_timer > 0.0:
@@ -381,8 +429,101 @@ func _play_step_audio_events(result: Dictionary) -> void:
 	for event_data in events:
 		if not (event_data is Dictionary):
 			continue
-		if str(event_data.get("type", "")) == "delivered":
+		var event_type := str(event_data.get("type", ""))
+		if event_type == "delivered":
 			audio_hooks.play_event("signal_delivered")
+		elif event_type == "corrupted_spawn":
+			audio_hooks.play_event("corrupted_spawn")
+			_add_corrupted_source_highlight(
+				int(event_data.get("x", -1)),
+				int(event_data.get("y", -1))
+			)
+		elif event_type == "corrupted_purged":
+			audio_hooks.play_event("corrupted_purged")
+			_add_corrupted_purge_highlight(
+				int(event_data.get("x", -1)),
+				int(event_data.get("y", -1))
+			)
+		elif event_type == "corrupted_sink_penalty":
+			audio_hooks.play_event("corrupted_penalty")
+
+func _add_corrupted_source_highlight(x: int, y: int) -> void:
+	if x < 0 or y < 0:
+		return
+
+	for i in range(corrupted_source_highlights.size()):
+		var existing: Dictionary = corrupted_source_highlights[i]
+		if int(existing.get("x", -1)) == x and int(existing.get("y", -1)) == y:
+			existing["timer"] = CORRUPTED_SOURCE_HIGHLIGHT_DURATION
+			corrupted_source_highlights[i] = existing
+			return
+
+	corrupted_source_highlights.append({
+		"x": x,
+		"y": y,
+		"timer": CORRUPTED_SOURCE_HIGHLIGHT_DURATION,
+	})
+
+func _update_corrupted_spawn_feedback(delta: float) -> void:
+	if corrupted_source_highlights.is_empty():
+		return
+
+	var next_highlights: Array[Dictionary] = []
+	var render_highlights: Array[Dictionary] = []
+
+	for entry in corrupted_source_highlights:
+		var timer: float = max(float(entry.get("timer", 0.0)) - delta, 0.0)
+		if timer <= 0.0:
+			continue
+		entry["timer"] = timer
+		next_highlights.append(entry)
+		render_highlights.append({
+			"x": int(entry.get("x", -1)),
+			"y": int(entry.get("y", -1)),
+			"strength": timer / CORRUPTED_SOURCE_HIGHLIGHT_DURATION,
+		})
+
+	corrupted_source_highlights = next_highlights
+	board_view.set_source_highlights(render_highlights)
+
+func _add_corrupted_purge_highlight(x: int, y: int) -> void:
+	if x < 0 or y < 0:
+		return
+
+	for i in range(corrupted_purge_highlights.size()):
+		var existing: Dictionary = corrupted_purge_highlights[i]
+		if int(existing.get("x", -1)) == x and int(existing.get("y", -1)) == y:
+			existing["timer"] = CORRUPTED_PURGE_HIGHLIGHT_DURATION
+			corrupted_purge_highlights[i] = existing
+			return
+
+	corrupted_purge_highlights.append({
+		"x": x,
+		"y": y,
+		"timer": CORRUPTED_PURGE_HIGHLIGHT_DURATION,
+	})
+
+func _update_corrupted_purge_feedback(delta: float) -> void:
+	if corrupted_purge_highlights.is_empty():
+		return
+
+	var next_highlights: Array[Dictionary] = []
+	var render_highlights: Array[Dictionary] = []
+
+	for entry in corrupted_purge_highlights:
+		var timer: float = max(float(entry.get("timer", 0.0)) - delta, 0.0)
+		if timer <= 0.0:
+			continue
+		entry["timer"] = timer
+		next_highlights.append(entry)
+		render_highlights.append({
+			"x": int(entry.get("x", -1)),
+			"y": int(entry.get("y", -1)),
+			"strength": timer / CORRUPTED_PURGE_HIGHLIGHT_DURATION,
+		})
+
+	corrupted_purge_highlights = next_highlights
+	board_view.set_purge_highlights(render_highlights)
 
 func _objectives_met() -> bool:
 	for signal_type in objectives.keys():

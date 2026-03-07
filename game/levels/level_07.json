@@ -1,0 +1,49 @@
+{
+  "id": "level_07",
+  "name": "Level 7 - Corrupted Purge Protocol",
+  "width": 10,
+  "height": 9,
+  "sim_step_seconds": 0.26,
+  "overload_max": 28,
+  "objectives": {
+    "blue": 16,
+    "red": 10
+  },
+  "components": [
+    {"x": 0, "y": 2, "type": "source", "orientation": 1, "signal_type": "blue", "spawn_interval_steps": 2, "corruption_interval_steps": 6},
+    {"x": 1, "y": 2, "type": "straight_wire", "orientation": 1},
+    {"x": 2, "y": 2, "type": "gate", "orientation": 3, "state": 1},
+
+    {"x": 2, "y": 1, "type": "corner_wire", "orientation": 1},
+    {"x": 3, "y": 1, "type": "straight_wire", "orientation": 1},
+    {"x": 4, "y": 1, "type": "straight_wire", "orientation": 1},
+    {"x": 5, "y": 1, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 1, "type": "sink", "orientation": 1, "signal_type": "blue"},
+
+    {"x": 2, "y": 3, "type": "corner_wire", "orientation": 0},
+    {"x": 3, "y": 3, "type": "straight_wire", "orientation": 1},
+    {"x": 4, "y": 3, "type": "straight_wire", "orientation": 1},
+    {"x": 5, "y": 3, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 3, "type": "purge_sink", "orientation": 1},
+
+    {"x": 0, "y": 6, "type": "source", "orientation": 1, "signal_type": "red", "spawn_interval_steps": 3, "corruption_interval_steps": 5},
+    {"x": 1, "y": 6, "type": "straight_wire", "orientation": 1},
+    {"x": 2, "y": 6, "type": "gate", "orientation": 3, "state": 1},
+
+    {"x": 2, "y": 5, "type": "corner_wire", "orientation": 1},
+    {"x": 3, "y": 5, "type": "straight_wire", "orientation": 1},
+    {"x": 4, "y": 5, "type": "straight_wire", "orientation": 1},
+    {"x": 5, "y": 5, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 5, "type": "sink", "orientation": 1, "signal_type": "red"},
+
+    {"x": 2, "y": 7, "type": "corner_wire", "orientation": 0},
+    {"x": 3, "y": 7, "type": "straight_wire", "orientation": 1},
+    {"x": 4, "y": 7, "type": "straight_wire", "orientation": 1},
+    {"x": 5, "y": 7, "type": "straight_wire", "orientation": 1},
+    {"x": 6, "y": 7, "type": "purge_sink", "orientation": 1},
+
+    {"x": 7, "y": 4, "type": "wall"},
+    {"x": 8, "y": 2, "type": "wall"},
+    {"x": 8, "y": 6, "type": "wall"}
+  ]
+}

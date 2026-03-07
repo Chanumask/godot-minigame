@@ -49,7 +49,24 @@ theme_override_colors/font_outline_color = Color(0.04, 0.05, 0.07, 0.92)
 theme_override_constants/outline_size = 2
 text = "Menu"
 
-[node name="ItemsBox" type="VBoxContainer" parent="Margin/VBox"]
+[node name="ItemsScroll" type="ScrollContainer" parent="Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
+follow_focus = true
+
+[node name="ItemsBox" type="VBoxContainer" parent="Margin/VBox/ItemsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 10
+
+[node name="HintLabel" type="Label" parent="Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.8, 0.86, 0.96, 0.96)
+theme_override_colors/font_outline_color = Color(0.04, 0.05, 0.07, 0.82)
+theme_override_constants/outline_size = 1
+text = "Up/Down Select   Enter Confirm   Esc Back"

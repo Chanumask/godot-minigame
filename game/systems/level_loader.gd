@@ -59,5 +59,6 @@ static func _normalize_component(component: Dictionary) -> Dictionary:
 		normalized["signal_type"] = component.get("signal_type", "blue")
 	if tile_type == "source":
 		normalized["spawn_interval_steps"] = max(int(component.get("spawn_interval_steps", 3)), 1)
+		normalized["corruption_interval_steps"] = max(int(component.get("corruption_interval_steps", 0)), 0)
 
 	return normalized
