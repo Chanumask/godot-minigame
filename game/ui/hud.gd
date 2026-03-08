@@ -12,6 +12,7 @@ const SIGNAL_TYPE_LABELS := {
 @onready var overload_bar: ProgressBar = %OverloadBar
 @onready var objective_label: Label = %ObjectiveLabel
 @onready var status_label: Label = %StatusLabel
+@onready var top_panel: Control = $Panel
 
 func set_level_name(level_name: String) -> void:
 	level_label.text = level_name
@@ -46,3 +47,8 @@ func set_objectives(objectives: Dictionary, delivered: Dictionary) -> void:
 
 func set_status(text_value: String) -> void:
 	status_label.text = text_value
+
+func get_top_bar_height() -> float:
+	if top_panel == null:
+		return 0.0
+	return top_panel.size.y

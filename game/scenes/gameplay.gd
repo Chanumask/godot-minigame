@@ -36,6 +36,11 @@ const COUNTDOWN_SECONDS := 3.0
 const END_TITLE_PULSE_SPEED := 2.2
 const END_TITLE_PULSE_AMOUNT := 0.06
 const OVERLOAD_WARNING_THRESHOLD_RATIO := 0.8
+const BOARD_HUD_GAP := 8.0
+const BOARD_SIDE_GAP := 12.0
+const BOARD_BOTTOM_GAP := 12.0
+const BOARD_MIN_SCALE := 0.1
+const BOARD_MAX_SCALE := 1.0
 const SPEED_MODE_NAMES: Array[String] = ["Slow", "Normal", "Fast"]
 const SPEED_MODE_MULTIPLIERS: Array[float] = [0.85, 1.0, 1.2]
 const CORRUPTED_SOURCE_HIGHLIGHT_DURATION := 0.34
@@ -178,8 +183,8 @@ func _input(event: InputEvent) -> void:
 	if moved:
 		var width: int = int(level_data.get("width", 1))
 		var height: int = int(level_data.get("height", 1))
-		cursor.x = clamp(cursor.x, 0, width - 1)
-		cursor.y = clamp(cursor.y, 0, height - 1)
+		cursor.x = posmod(cursor.x, max(width, 1))
+		cursor.y = posmod(cursor.y, max(height, 1))
 		board_view.set_cursor(cursor)
 		_refresh_hud()
 		accept_event()
@@ -337,8 +342,26 @@ func _center_board_in_view() -> void:
 	if viewport_size == Vector2.ZERO:
 		return
 
-	var centered_position := ((viewport_size - board_size) * 0.5).round()
-	board_view.position = centered_position
+	var hud_height: float = 0.0
+	if hud != null:
+		hud_height = hud.get_top_bar_height()
+
+	var available_origin_y: float = hud_height + BOARD_HUD_GAP
+	var available_size := Vector2(
+		maxf(viewport_size.x - BOARD_SIDE_GAP * 2.0, 1.0),
+		maxf(viewport_size.y - available_origin_y - BOARD_BOTTOM_GAP, 1.0)
+	)
+
+	var width_fit_scale: float = available_size.x / maxf(board_size.x, 1.0)
+	var height_fit_scale: float = available_size.y / maxf(board_size.y, 1.0)
+	var fit_scale: float = minf(width_fit_scale, height_fit_scale)
+	var board_scale: float = clampf(fit_scale, BOARD_MIN_SCALE, BOARD_MAX_SCALE)
+	board_view.scale = Vector2.ONE * board_scale
+
+	var scaled_board_size: Vector2 = board_size * board_scale
+	var centered_x: float = (viewport_size.x - scaled_board_size.x) * 0.5
+	var centered_y: float = available_origin_y + (available_size.y - scaled_board_size.y) * 0.5
+	board_view.position = Vector2(round(centered_x), round(centered_y))
 
 func _refresh_hud() -> void:
 	hud.set_level_name(level_data.get("name", "Level"))

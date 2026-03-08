@@ -2,6 +2,7 @@ extends RefCounted
 class_name SignalSimulator
 
 const CORRUPTED_NORMAL_SINK_OVERLOAD_SPIKE := 8
+const SPAWN_INTERVAL_MULTIPLIER := 1.5
 
 var width: int = 0
 var height: int = 0
@@ -22,10 +23,15 @@ func setup(level_data: Dictionary) -> void:
 		for x in range(width):
 			var tile: Dictionary = tiles[y][x]
 			if tile.get("type", "empty") == "source":
+				var base_interval_steps: int = maxi(int(tile.get("spawn_interval_steps", 3)), 1)
+				var adjusted_interval_steps: int = maxi(
+					int(ceil(float(base_interval_steps) * SPAWN_INTERVAL_MULTIPLIER)),
+					1
+				)
 				sources.append({
 					"x": x,
 					"y": y,
-					"interval": int(tile.get("spawn_interval_steps", 3)),
+					"interval": adjusted_interval_steps,
 					"timer": 0,
 					"emission_count": 0,
 					"corruption_interval": int(tile.get("corruption_interval_steps", 0)),
